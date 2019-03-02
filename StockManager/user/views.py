@@ -4,56 +4,33 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import User, Stocks ,Transaction
+from .models import User, Stocks
 
-from .models import Stocks, User ,Transaction 
-from .serializers import *  
+ 
+def login(request):
+	return render(request,'login.html')
 
-class UserList(generics.ListAPIView):
-	queryset = User.objects.filter()
-	serializer_class = UserSerializer
+def home(request):
+	return render(request,'home.html')
 
+def stock(request):
+	return render(request,'stockpage.html')
 
-class UserDetail(generics.RetrieveAPIView):
-	queryset = User.objects.filter()
-	serializer_class = UserSerializer
+def signup(request):
+	return render(request,'signup.html')
 
+def profile(request):
+	return render(request,'profile.html')
 
-class UserCreate(generics.CreateAPIView):
-	queryset = User.objects.filter()
-	serializer_class = UserSerializer
+def addStocks(request):
+	return render(request,'stockpage.html')
 
+def deleteStocks(request):
+	return render(request,'stockpage.html')
 
-class UserDelete(generics.DestroyAPIView):
-    queryset = User.objects.filter()
-    serializer_class = UserSerializer
+def logout(request):
+	return render(request,'login.html')
 
+def about(request):
+	return render(request,'about.html')
 
-class UserUpdate(generics.UpdateAPIView):
-    queryset = User.objects.filter()
-    serializer_class = UserSerializer
-
-
-class StockList(generics.ListAPIView):
-	queryset = Stocks.objects.filter()
-	serializer_class = StockSerializer
-
-
-class StockDetail(generics.RetrieveAPIView):
-	queryset = Stocks.objects.filter()
-	serializer_class = StockSerializer
-
-
-class StockCreate(generics.CreateAPIView):
-	queryset = Stocks.objects.filter()
-	serializer_class = StockSerializer
-
-
-class StockDelete(generics.DestroyAPIView):
-    queryset = Stocks.objects.filter()
-    serializer_class = StockSerializer
-
-
-class StockUpdate(generics.UpdateAPIView):
-    queryset = Stocks.objects.filter()
-    serializer_class = StockSerializer
