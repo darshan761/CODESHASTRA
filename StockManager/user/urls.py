@@ -11,6 +11,7 @@ urlpatterns = [
     path('stocks/',views.getStocks,name = 'getStock'),
     path('register/',views.register,name = 'register'),
     path('home/',views.home,name='home'),
+    path('mystocks/',views.mystock,name = 'mystock'),
     path('stockadded/<int:slug>',views.addStocks,name='addStock'),
     path('stockdeleted/<int:slug>',views.deleteStocks,name='delete'),
     path('stock/',views.stock,name='stock'),

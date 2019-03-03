@@ -39,13 +39,13 @@ def enter(request):
 				return render(request, 'home.html',context)
 	else:
          e = "User doesn't exist"
-	return render(request,'login.html',{'error' : e})
+	return render(request,'landingpage.html',{'error' : e})
 
 def home(request):
 	usr = User.objects.filter(id = request.session['usid'])
 	for i in usr:
 		u = i
-	return render(request,'home.html',{'u':u})
+	return render(request,'landingpage.html',{'u':u})
 
 def stock(request):
 	stock_list = Stocks.objects.all()
@@ -70,7 +70,7 @@ def register(request):
 
 	return render(request,'signup.html',{"error":error})
 
-def profile(request):
+def mystock(request):
 	s = Stocks.objects.all()
 	t = Transaction.objects.filter(user=request.session['usid'])
 	us = []
@@ -86,6 +86,14 @@ def profile(request):
 			st.append(i)
 	print("user",st)
 	return render(request,'profile.html',{'st':us})
+
+
+def profile(request):
+	usr = User.objects.filter(id = request.session['usid'])
+	for i in usr:
+		u = i
+	return render(request,'home.html',{'u':u})
+	
 
 def deleteStocks(request,slug):
 	s = Stocks.objects.filter(id = slug)
