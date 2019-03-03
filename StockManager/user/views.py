@@ -8,24 +8,180 @@ from rest_framework.response import Response
 from rest_framework import generics
 from .models import User, Stocks, Transaction
 from googlefinance.client import get_price_data, get_prices_data, get_prices_time_data
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import xlrd
+ 
+
+future = []
+
+
+
+
+def scaling(X_train):
+  X_train = X_train.reshape(-1, 1)
+  sc = MinMaxScaler(feature_range = (0, 1))
+  training_set_scaled = sc.fit_transform(X_train)
+  return training_set_scaled, sc
+
+def load_model(filename):
+  reg = pickle.load(open(filename, 'rb'))
+  return reg
+
+def test_sol(X, sc, regressor):
+  #X_t = X_test.reshape((-1, 1))
+  #print(X_t.shape)
+  var = X.reshape((-1, 1))
+  #print(var.shape)
+  #np.concatenate((X_train, X_test.reshape(-1, 1)), axis = 0) 
+  inputs = sc.transform(var)
+
+  X_test = []
+  #print(inputs.shape)
+  for i in range(60, inputs.shape[0]):
+    X_test.append(inputs[i-60:i, 0])
+  
+  X_test = np.array(X_test)
+  #print("X_test.shape ", X_test.shape)
+  #X_test.shape
+  X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+  #print(X_test)
+  #for i in range(0, 60):
+  #  print(X_test[0][i], X_test[1][i])
+  predicted_stock_price = regressor.predict(X_test)
+  predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+
+  return predicted_stock_price #X is real stock prices
+# %matplotlib inline
+
+def perpetual(count, X, sc, regressor):
+  '''
+  X should be shaped as 1, 60, 1
+  '''
+  for i in range(count):
+    #print(X)
+    #var = X_test = X.reshape((-1, 1)) #60, 1
+    inputs = sc.transform(X)
+    X_test = np.array(inputs)
+    X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+    predicted_stock_price = regressor.predict(X_test)
+    predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+    #print("predicted: ", predicted_stock_price)
+    future.append(predicted_stock_price[0, 0])
+    X = np.roll(X, -1)
+    X[0, 59] = predicted_stock_price[0, 0]
+    #print(X)
+    
+  
+
+def plotit(real_stock_price, predicted_stock_price):
+  #real_stock_price = X
+  plt.plot(real_stock_price, color = 'red', label = 'Real Google Stock Price')
+  a = np.average(real_stock_price)
+  p = np.zeros((60, 1))
+  p.fill(a)
+  print(p)
+  predicted_stock_price = np.concatenate((p, predicted_stock_price), axis = 0)
+  plt.plot(predicted_stock_price, color = 'blue', label = 'Predicted Google Stock Price')
+  plt.title('Google Stock Price Prediction')
+  plt.xlabel('Time')
+  plt.ylabel('Google Stock Price')
+  plt.legend()
+  #plt.show() # SAVE IT
+  plt.savefig(final_path)
+
+
+
+
+
 
  
+
 def getStocks(request):
-	mydict = {'Microsoft':'MSFT','Google':'GOOG','Barclays':'BCS','JP Morgan Chase':'JPM','Bank of america':'bac'}
-			#'Infosys':'infy','Tata Motors':'ttm','Berkshire':'berk','toyota':'tm','apple':'aapl',
-			#'amazon':'amzn','Tesla':'tsla','Berkshire Hathaway':'brk.a','Facebook':'fb','Twitter':'twtr'}
-	for i  in mydict.values():
-		s = Stocks()
-		param = {
-		'q': "AAPL", # Stock symbol (ex: "AAPL")
-        'i': "86400", # Interval size in seconds ("86400" = 1 day intervals)
-        'x': "NASD", # Stock exchange symbol on which stock is traded (ex: "NASD")
-        'p': "1M"
-		}
-		df = get_price_data(param)
-		s.description = list(mydict.keys())[list(mydict.values()).index(i)]
-		print(df)
-	return render(request,'stockpage.html')
+symb={'Microsoft':'MSFT','Google':'GOOG','Barclays':'BCS','JP Morgan Chase':'JPM','Bank of america':'bac'}
+for i in symb.values():
+	print('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+i+'&apikey=62Q1OEQMZI876K16')
+	response = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='+i+'&apikey=62Q1OEQMZI876K16')
+	stocks = response.json()
+#filename = stocks
+#suffix = '.json'
+#with open(()) as f:
+    data = stocks
+
+
+d = data['Time Series (Digital Currency Daily)']  #Time Series (Daily)
+
+dates = d.keys()
+
+_open = []
+_close = []
+_high = []
+_low = []
+_value = []
+
+for date in d:
+  _close.append(float(d[date]['4a. close (USD)'])) #4. close
+
+print(len(_close))
+
+k = np.array(_close).reshape(len(_close), 1)
+
+print(k)
+
+#from tempfile import TemporaryFile
+#outfile = TemporaryFile()
+
+np.save(filename, k)
+print('here')
+filename = os.path.dirname(os.path.realpath(__file__)) + '/btc.npy'
+X = X_train = np.load(filename)
+
+training_set_scaled, sc = scaling(X_train)
+model = os.path.dirname(os.path.realpath(__file__)) + '/hundred_epochs.pkl'
+regressor = load_model(model)
+predicted_stock_price = test_sol(X_train, sc, regressor)
+real_stock_price = X_train
+
+  # perpetual()
+
+A = real_stock_price.reshape(-1, 1)
+temp = A[-60:].reshape(1, 60)
+  # print(temp)
+say = A[0:60, 0].reshape(60, 1)
+perpetual(5, temp, sc, regressor)
+F = np.array(future)
+F = F.reshape(F.shape[0], 1)
+B = predicted_stock_price.reshape(-1, 1)
+B = np.concatenate((B, F), axis=0)
+  ##B = np.concatenate((B, F), axis=0)
+  # for i, j in zip(A, B):
+  #  print(i, j)
+  # from datetime import datetime
+  # from datetime import timedelta
+  # date = datetime.strptime(dates[-1], '%Y-%m-%d')
+  # print(date)
+plotit(A, B)
+  # print()
+  # return render(request, 'stockpage.html')
+
+return render(request, 'stockpage.html')
+
+
+def plot_bar_x(prices,time,cityname):
+    # this is for plotting purpose
+	index = np.arange(len(time))
+	plt.bar(index,prices)
+	plt.xlabel('Year', fontsize=15)
+	plt.ylabel('Price per square feet', fontsize=5)
+	plt.xticks(index, time, fontsize=5)
+	plt.title(cityname)
+	#plt.figure(figsize=(40, 30))
+	#plt.show()
+	plt.savefig(cityname+".png")
+	return
+	
+
 
 
 def login(request):
@@ -144,7 +300,22 @@ def addStocks(request,slug):
 
 	return render(request,'stockpage.html')
 
+def house(request):
+	return render(request,'house.html')
 
+def getBar(request):
+	city = request.POST.get('dropdown')
+	xls = pd.ExcelFile("C:\\Users\\HP\\Desktop\\Codeshastra\\StockManager\\user\\HPI@Assessment Prices_Prices.xls")
+	sheetX = xls.parse(0) #0 is the sheet number
+	#uniquecitynames= sheetX['City'].unique()
+	df=sheetX
+	print(sheetX.groupby(['City']).groups.keys())
+	prices=df.loc[df['City'] == city]
+	#print(prices['Composite Price'])
+	pricevalues=prices['Composite Price']
+	time=prices['Quarter']
+	plot_bar_x(pricevalues,time,city)
+	return render(request,'house.html')
 
 def logout(request):
 	return render(request,'login.html')
@@ -154,4 +325,8 @@ def about(request):
 
 def know(request):
 	return render(request,'jargons.html')
+
+
+
+
 

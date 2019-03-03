@@ -18,6 +18,8 @@ urlpatterns = [
     path('about/',views.about,name='about'),
     path('profile/',views.profile,name='profile'),
     path('logout/',views.logout,name='logout'),
-    path('know/',views.know,name = 'know')
+    path('know/',views.know,name = 'know'),
+    path('house/',views.house,name = 'house'),
+    path('houseg/',views.getBar,name = 'getB')
     
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

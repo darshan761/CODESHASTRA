@@ -1,0 +1,14 @@
+{% include "navbar.html" %}
+
+<div>
+<P>Select City</P>
+<form action="{%  url 'getB'  %}" method="POST">{% csrf_token%}
+<select name="dropdown">
+        <option>Mumbai</option>
+        <option>Pune</option>
+        <option>Hyderabad</option>
+        <option>Nagpur</option>
+</select>
+<button type="submit">Show Graph</button>
+</form>
+</div>
