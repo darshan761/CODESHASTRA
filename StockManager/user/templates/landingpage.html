@@ -47,14 +47,15 @@
 </nav>
     <div class="card-deck" style="margin-left:12%;margin-right:12%;margin-bottom:5%;margin-top:5%">
       <div class="card">
-        <a href = "{% url 'house' %}"><img class="card-img-top" src="/static/img/mutualfund.jpg" alt="Card image cap" style="height:80%;width:100%;">
-        <div class="card-body text-danger">
+        <img class="card-img-top" onclick="location.href='{% url 'stock' %}'" src="/static/img/mutualfund.jpg" alt="Card image cap" style="height:80%;width:100%;">
+       <div class="card-body text-danger">
           <h5 class="card-title"></h5>
-          <p class="card-text"><h2>Buy your mutual funds here!</h2></p>
-        </div></a>
+          <p class="card-text"><h2>Analysing mutual funds here!</h2></p>
+        </div>
+        </a>
       </div>
       <div class="card card w-75">
-        <img class="card-img-top" src="/static/img/property.jpg" alt="Card image cap" style="height:80%;width:100%;">
+        <img class="card-img-top" onclick="location.href='{% url 'house' %}'" src="/static/img/property.jpg" alt="Card image cap" style="height:80%;width:100%;">
         <div class="card-body text-danger">
           <p class="card-text"><h2>Quest before you invest!</h2></p>
         </div>
@@ -65,7 +66,7 @@
 
     <div class="card-deck" style="margin-left:12%;margin-right:12%;margin-bottom:12%;">
       <div class="card">
-        <img class="card-img-top" src="/static/img/bitcoin.jpg" alt="Card image cap" style="height:80%;width:100%;">
+        <img class="card-img-top" onclick="{% url 'stock' %}" src="/static/img/bitcoin.jpg" alt="Card image cap" style="height:80%;width:100%;">
         <div class="card-body text-danger">
           <h5 class="card-title"></h5>
           <p class="card-text"><h2>Cryptocurrency</h2></p>
@@ -73,7 +74,7 @@
       </div>
 
           <div class="card" >
-            <img class="card-img-top" src="/static/img/stock.jpeg" alt="Card image cap" style="height:80%;width:100%;">
+            <img class="card-img-top" onclick="{% url 'stock' %}" src="/static/img/stock.jpeg" alt="Card image cap" style="height:80%;width:100%;">
             <div class="card-body text-danger">
               <p class="card-text"><h2>Stock before it drops!</h2></p>
             </div>

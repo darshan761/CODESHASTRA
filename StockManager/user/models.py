@@ -15,6 +15,7 @@ class Stocks(models.Model):
     low = models.FloatField(default=0.0)
     close = models.FloatField(default=0.0)
     volume = models.IntegerField(default=0)
+    symb = models.CharField(max_length=5,help_text="Enter Symbol")
     #user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
 
     def __str__(self):
